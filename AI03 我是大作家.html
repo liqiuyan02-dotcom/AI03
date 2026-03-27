@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI编程第4课：我是大作家（上）</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           VIEWPORT BASE STYLES (MANDATORY)
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: visible;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--slide-padding);
+            max-height: 100%;
+            overflow: visible;
+            position: relative;
+        }
+
+        /* ===========================================
+           THEME VARIABLES - Split Pastel
+           =========================================== */
+        :root {
+            --bg-peach: #f5e6dc;
+            --bg-lavender: #e4dff0;
+            --bg-mint: #e8f5e9;
+            --bg-sky: #e3f2fd;
+            --text-dark: #1a1a1a;
+            --text-secondary: #555555;
+            --badge-mint: #c8f0d8;
+            --badge-yellow: #f0f0c8;
+            --badge-pink: #f0d4e0;
+            --badge-lavender: #d4c8e8;
+            --badge-coral: #f5d4c8;
+
+            /* Typography */
+            --title-size: clamp(2rem, 6vw, 4.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1.25rem, 3vw, 2rem);
+            --body-size: clamp(0.875rem, 1.8vw, 1.25rem);
+            --small-size: clamp(0.75rem, 1.5vw, 1rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(1rem, 2.5vw, 2rem);
+            --element-gap: clamp(0.5rem, 1.5vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { box-sizing: border-box; }
+
+        /* ===========================================
+           SLIDE BACKGROUNDS
+           =========================================== */
+        .slide-1, .slide-5, .slide-9, .slide-13, .slide-17, .slide-21 {
+            background: linear-gradient(135deg, var(--bg-peach) 0%, var(--bg-lavender) 100%);
+        }
+
+        .slide-2, .slide-6, .slide-10, .slide-14, .slide-18, .slide-22 {
+            background: linear-gradient(135deg, var(--bg-lavender) 0%, var(--bg-mint) 100%);
+        }
+
+        .slide-3, .slide-7, .slide-11, .slide-15, .slide-19 {
+            background: linear-gradient(135deg, var(--bg-mint) 0%, var(--bg-sky) 100%);
+        }
+
+        .slide-4, .slide-8, .slide-12, .slide-16, .slide-20 {
+            background: linear-gradient(135deg, var(--bg-sky) 0%, var(--bg-peach) 100%);
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .decorative-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .shape-1 { width: 120px; height: 120px; background: var(--badge-mint); top: 5%; left: 5%; }
+        .shape-2 { width: 80px; height: 80px; background: var(--badge-pink); bottom: 10%; right: 8%; }
+        .shape-3 { width: 60px; height: 60px; background: var(--badge-yellow); top: 40%; right: 15%; }
+        .shape-4 { width: 100px; height: 100px; background: var(--badge-lavender); bottom: 30%; left: 10%; }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.1;
+            margin: 0 0 var(--element-gap) 0;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+            margin: 0 0 var(--element-gap) 0;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.3;
+            margin: 0 0 var(--element-gap) 0;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0 0 var(--element-gap) 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        p:last-child, li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===========================================
+           COMPONENTS
+           =========================================== */
+        .badge-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: var(--small-size);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge-mint { background: var(--badge-mint); }
+        .badge-yellow { background: var(--badge-yellow); }
+        .badge-pink { background: var(--badge-pink); }
+        .badge-lavender { background: var(--badge-lavender); }
+        .badge-coral { background: var(--badge-coral); }
+
+        .subtitle {
+            font-size: var(--h3-size);
+            color: var(--text-secondary);
+            margin-bottom: var(--content-gap);
+            max-width: 700px;
+            line-height: 1.4;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: clamp(1rem, 2.5vw, 2rem);
+            margin-bottom: var(--element-gap);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: visible;
+        }
+
+        .card > *:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-title {
+            font-size: var(--h3-size);
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: var(--element-gap);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.5em;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list .icon {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--content-gap);
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--content-gap);
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Numbered list */
+        .numbered-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            counter-reset: item;
+        }
+
+        .numbered-list li {
+            counter-increment: item;
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .numbered-list li::before {
+            content: counter(item);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--badge-mint);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: var(--small-size);
+            flex-shrink: 0;
+        }
+
+        /* Story types grid */
+        .story-types {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-top: var(--content-gap);
+        }
+
+        @media (max-width: 1024px) {
+            .story-types {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .story-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .story-type-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: visible;
+        }
+
+        .story-type-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .story-type-letter {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .story-type-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        /* Role card template */
+        .role-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--badge-pink);
+        }
+
+        .role-card h4 {
+            font-size: var(--h3-size);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .role-card .field {
+            margin-bottom: 0.75rem;
+            font-size: var(--body-size);
+        }
+
+        .role-card .field strong {
+            color: var(--text-dark);
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background: var(--text-dark);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-size: var(--body-size);
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: var(--content-gap);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--badge-mint), var(--badge-pink));
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        /* Navigation dots */
+        .nav-dots {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--text-dark);
+            transform: scale(1.3);
+        }
+
+        @media (max-width: 768px) {
+            .nav-dots {
+                display: none;
+            }
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(0,0,0,0.4);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .keyboard-hint {
+                display: none;
+            }
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* Floating animation for shapes */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .shape {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape-1 { animation-delay: 0s; }
+        .shape-2 { animation-delay: 2s; }
+        .shape-3 { animation-delay: 4s; }
+        .shape-4 { animation-delay: 1s; }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .shape {
+                animation: none;
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING (Optional)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-toggle.show, .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .edit-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* ===========================================
+           CODE BLOCK WITH COPY BUTTON
+           =========================================== */
+        .code-block-wrapper {
+            position: relative;
+            margin: var(--element-gap) 0;
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            padding-top: 2.5rem;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: var(--small-size);
+            color: #e4e4e4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            max-width: 100%;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .copy-btn.copied {
+            background: var(--badge-mint);
+            color: var(--text-dark);
+            border-color: var(--badge-mint);
+        }
+
+        /* ===========================================
+           DEMO SCREEN STYLES
+           =========================================== */
+        .demo-frame {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .demo-header {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .demo-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .demo-dot.red { background: #ff5f57; }
+        .demo-dot.yellow { background: #ffbd2e; }
+        .demo-dot.green { background: #28c840; }
+
+        .demo-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'SF Mono', monospace;
+            font-size: var(--small-size);
+            line-height: 1.6;
+        }
+
+        .demo-content .line {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-content .prompt {
+            color: var(--badge-mint);
+            margin-right: 0.5rem;
+        }
+
+        /* Role card illustration */
+        .role-illustration {
+            background: linear-gradient(135deg, var(--bg-peach), var(--bg-lavender));
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-avatar {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* SVG Illustrations */
+        .svg-illustration {
+            width: 100%;
+            max-width: 300px;
+            margin: 1rem auto;
+            display: block;
+        }
+
+        .svg-illustration svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Floating animation for illustrations */
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float-gentle 4s ease-in-out infinite;
+        }
+
+        /* Story type icons */
+        .story-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .story-icon.school { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
+        .story-icon.magic { background: linear-gradient(135deg, #e17055, #d63031); }
+        .story-icon.time { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        .story-icon.animal { background: linear-gradient(135deg, #55efc4, #00b894); }
+        .story-icon.future { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+
+        [contenteditable="true"] {
+            outline: 2px dashed var(--badge-pink);
+            outline-offset: 4px;
+            cursor: text;
+        }
+
+        [contenteditable="true"]:focus {
+            outline: 2px solid var(--text-dark);
+        }
+
+        .edit-notification {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10002;
+            pointer-events: none;
+        }
+
+        .edit-notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar with Page Number -->
+    <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <div class="progress-bar" id="progressBar"></div>
+        <div style="position: absolute; top: 6px; right: 20px; font-size: 12px; color: var(--text-secondary); font-weight: 600; padding: 4px 12px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <span id="pageNumber">1 / 22</span>
+        </div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Edit Hotzone & Toggle -->
+    <div class="edit-hotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="编辑模式 (E)">✏️</button>
+    <div class="edit-notification" id="editNotification">按 E 键或点击按钮进入编辑模式</div>
+
+    <!-- ==================== SLIDE 1: 封面 ==================== -->
+    <section class="slide slide-1" data-slide="1">
+        <div class="decorative-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">AI编程</span>
+                <span class="badge badge-yellow">第4课</span>
+                <span class="badge badge-pink">90分钟</span>
+            </div>
+            <h1 class="reveal">我是大作家（上）</h1>
+            <p class="subtitle reveal">用 Trae IDE 开启你的创作之旅</p>
+
+            <!-- Creative Writing Illustration -->
+            <div class="svg-illustration reveal float-animation" style="max-width: 250px; margin: 1.5rem auto;">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Circle -->
+                    <circle cx="100" cy="100" r="90" fill="#f5e6dc" opacity="0.5"/>
+
+                    <!-- Book -->
+                    <rect x="50" y="70" width="100" height="80" rx="5" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+                    <rect x="50" y="70" width="50" height="80" rx="5" fill="#e4dff0" stroke="#1a1a1a" stroke-width="2"/>
+                    <line x1="100" y1="70" x2="100" y2="150" stroke="#1a1a1a" stroke-width="2"/>
+
+                    <!-- Text lines on book -->
+                    <line x1="60" y1="85" x2="90" y2="85" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="60" y1="95" x2="85" y2="95" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="60" y1="105" x2="90" y2="105" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="110" y1="85" x2="140" y2="85" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="110" y1="95" x2="135" y2="95" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+
+                    <!-- Pencil -->
+                    <rect x="130" y="40" width="15" height="70" rx="2" fill="#f0b4d4" stroke="#1a1a1a" stroke-width="2" transform="rotate(30 137.5 75)"/>
+                    <polygon points="137.5,35 145,50 130,50" fill="#ffeaa7" stroke="#1a1a1a" stroke-width="2" transform="rotate(30 137.5 75)"/>
+
+                    <!-- Magic sparkles -->
+                    <circle cx="160" cy="50" r="4" fill="#c8f0d8"/>
+                    <circle cx="170" cy="65" r="3" fill="#f0f0c8"/>
+                    <circle cx="155" cy="75" r="5" fill="#f0d4e0"/>
+                    <circle cx="165" cy="85" r="3" fill="#c8f0d8"/>
+
+                    <!-- Stars around book -->
+                    <text x="40" y="60" font-size="20" fill="#f0b4d4">✦</text>
+                    <text x="160" y="120" font-size="16" fill="#c8f0d8">✦</text>
+                    <text x="35" y="130" font-size="14" fill="#f0f0c8">✦</text>
+                </svg>
+            </div>
+
+            <p class="reveal" style="color: var(--text-secondary);">适合小学四年级学生</p>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 2: 教学准备 ==================== -->
+    <section class="slide slide-2" data-slide="2">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-yellow">课前准备</span>
+            </div>
+            <h2 class="reveal">上课前需要准备什么？</h2>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">👨‍🏫</span>教师准备</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">✓</span>确认学生电脑已安装 Trae IDE</li>
+                        <li><span class="icon">✓</span>为打字慢的学生预装语音输入法</li>
+                        <li><span class="icon">✓</span>准备 AI 生成作品展示素材</li>
+                        <li><span class="icon">✓</span>准备 Markdown 示范短文</li>
+                        <li><span class="icon">✓</span>准备角色设定卡投屏模板</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">👨‍🎓</span>学生准备</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">💭</span>课前想一想：你最近看过什么好看的故事？</li>
+                        <li><span class="icon">📖</span>可以是动画、漫画、小说都可以</li>
+                        <li><span class="icon">🤔</span>想一想：那个故事为什么吸引你？</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 3: 课程概览 ==================== -->
+    <section class="slide slide-3" data-slide="3">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-lavender">课程概览</span>
+            </div>
+            <h2 class="reveal">今天我们要学什么？</h2>
+            <div class="grid-3 reveal">
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🛠️</span>认识新工具</div>
+                    <p>学习 Trae IDE 的 Builder 模式，掌握左侧文件、中栏代码区、右侧对话的三栏布局</p>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">✨</span>Markdown魔法</div>
+                    <p>学会三个符号：# 标题、- 列表、** 加粗，让文字变漂亮</p>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📖</span>设计故事</div>
+                    <p>三步定故事：选类型、造角色、选地点，搭建属于你的故事世界</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 4: 教学目标 ==================== -->
+    <section class="slide slide-4" data-slide="4">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">教学目标</span>
+            </div>
+            <h2 class="reveal">学完这节课，你将能够...</h2>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📚</span>知识目标</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">✓</span>认识 Trae IDE 的 Builder 模式界面</li>
+                        <li><span class="icon">✓</span>掌握 Markdown 三个基础符号</li>
+                        <li><span class="icon">✓</span>理解"先设计再创作"的思维</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">💪</span>能力目标</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">✓</span>用结构化语言描述故事要素</li>
+                        <li><span class="icon">✓</span>完成右侧对话输入、中栏代码预览的操作流程</li>
+                        <li><span class="icon">✓</span>根据模板填写角色设定卡</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap);">
+                <div class="card-title"><span class="card-icon">❤️</span>情感目标</div>
+                <p>建立对 AI 创作工具的好奇心和掌控感，激发创作欲望，理解"大作品从小处开始"</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: 核心概念 ==================== -->
+    <section class="slide slide-5" data-slide="5">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-coral">核心能力</span>
+            </div>
+            <h2 class="reveal">这节课培养两大能力</h2>
+            <div class="grid-2 reveal">
+                <div class="card" style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🗣️</div>
+                    <h3>表达力</h3>
+                    <p>用清晰、结构化的语言向 AI 描述你的想法，让 AI 准确理解你想要什么</p>
+                </div>
+                <div class="card" style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">❓</div>
+                    <h3>提问力</h3>
+                    <p>学会提出好问题，引导 AI 帮你完成创作，做 AI 的小导演</p>
+                </div>
+            </div>
+            <div class="card reveal" style="text-align: center; margin-top: var(--content-gap);">
+                <p style="font-size: var(--h3-size); color: var(--text-dark);">核心工具：Trae IDE (Builder模式) + Markdown</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: 误概念预设 M1-M2 ==================== -->
+    <section class="slide slide-6" data-slide="6">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-pink">常见误区</span>
+            </div>
+            <h2 class="reveal">这些想法要纠正哦！</h2>
+            <div class="grid-2 reveal">
+                <div class="card" style="border-left: 4px solid var(--badge-coral);">
+                    <div class="card-title">❌ 误区1</div>
+                    <p>"Trae 就是另一个聊天工具，跟之前用的差不多"</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px;">
+                        <strong>✓ 正确认知：</strong>Trae 是专业创作工具，能写故事、做网站、做游戏，聊天只是入口
+                    </div>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--badge-coral);">
+                    <div class="card-title">❌ 误区2</div>
+                    <p>"右边的预览窗口不用管"</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px;">
+                        <strong>✓ 正确认知：</strong>预览窗是"魔法镜子"，所有内容会实时排版显示
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: 误概念预设 M3-M4 ==================== -->
+    <section class="slide slide-7" data-slide="7">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-pink">常见误区</span>
+            </div>
+            <h2 class="reveal">还有这些也要注意！</h2>
+            <div class="grid-2 reveal">
+                <div class="card" style="border-left: 4px solid var(--badge-coral);">
+                    <div class="card-title">❌ 误区3</div>
+                    <p>"写故事直接让 AI 写就行了"</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px;">
+                        <strong>✓ 正确认知：</strong>好故事要先有设计（谁、在哪、发生什么），像盖房子先画图纸
+                    </div>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--badge-coral);">
+                    <div class="card-title">❌ 误区4</div>
+                    <p>"角色设定写得越多越好"</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px;">
+                        <strong>✓ 正确认知：</strong>简单清晰的设定比又长又乱的好，AI 也更容易理解
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- ==================== SLIDE 8: 第一幕 联系 ==================== -->
+    <section class="slide slide-8" data-slide="8">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-lavender">第一幕</span>
+                <span class="badge badge-mint">10分钟</span>
+            </div>
+            <h1 class="reveal">联系 Connect</h1>
+            <p class="subtitle reveal" style="max-width: 800px;">先看几个神奇的东西！这些全是 AI 做出来的——动画、游戏、网站。而且它们的起点都是同一个东西：一个故事。</p>
+
+
+
+            <div class="card reveal" style="max-width: 700px; margin-top: 1rem;">
+                <p style="font-size: var(--h3-size); color: var(--text-dark); font-weight: 600;">从今天开始，每个人要写一本属于自己的短篇小说！</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: 第二幕 建构 ==================== -->
+    <section class="slide slide-9" data-slide="9">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-lavender">第二幕</span>
+                <span class="badge badge-mint">65分钟</span>
+            </div>
+
+            <h1 class="reveal">建构 Construct</h1>
+            <p class="subtitle reveal">三个分段，一步步学会创作</p>
+            <div class="grid-3 reveal" style="margin-top: 2rem;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛠️</div>
+                    <h4>分段一</h4>
+                    <p>认识你的创作工具<br><small>(20分钟)</small></p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
+                    <h4>分段二</h4>
+                    <p>三步定故事<br><small>(30分钟)</small></p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✍️</div>
+                    <h4>分段三</h4>
+                    <p>小试牛刀<br><small>(15分钟)</small></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 10: 分段一 认识工具 ==================== -->
+    <section class="slide slide-10" data-slide="10">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-coral">分段一</span>
+                <span class="badge badge-yellow">20分钟</span>
+            </div>
+            <h2 class="reveal">认识你的创作工具</h2>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title">📋 预设误概念</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">⚠️</span>"Trae 就是另一个聊天工具"</li>
+                        <li><span class="icon">⚠️</span>"右边的预览窗口不用管"</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">⏱️ 时间安排</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">🎓</span>讲解与演示：8分钟</li>
+                        <li><span class="icon">👨‍💻</span>学生实践：10分钟</li>
+                        <li><span class="icon">✋</span>进度同步：2分钟</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap); background: var(--badge-yellow);">
+                <p style="color: var(--text-dark); font-weight: 600;">💡 关键任务：让学生完成 Builder 模式的基本右侧对话输入、中栏代码预览操作</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 11: Trae Builder模式 ==================== -->
+    <section class="slide slide-11" data-slide="11">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">工具介绍</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 900px; margin-bottom: var(--element-gap);">
+                <h2 class="reveal">Trae Builder 模式</h2>
+                <a href="https://www.bilibili.com/video/BV1nCRRYeEZa/?spm_id_from=333.337.search-card.all.click&vd_source=a1fcb6a07a4e0bdd0c8c96643655c352" target="_blank" class="cta-button" style="margin-top: 0;">
+                    📺 观看演示视频
+                </a>
+            </div>
+            <p class="subtitle reveal">左侧文件，中栏代码区，右侧对话</p>
+            <div class="grid-3 reveal" style="max-width: 1000px; width: 100%;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📁</div>
+                    <h4>左侧：文件</h4>
+                    <p style="font-size: 0.85rem;">管理你的项目文件</p>
+                    <div class="demo-frame" style="margin-top: 0.75rem; height: 120px; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div class="demo-header" style="padding: 5px 10px;">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                        </div>
+                        <div style="text-align: left; font-size: 0.75rem; padding: 10px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <span style="margin-right: 5px;">📄</span>
+                                <span>角色设定.md</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <span style="margin-right: 5px;">📄</span>
+                                <span>故事大纲.md</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span style="margin-right: 5px;">📄</span>
+                                <span>第一章.md</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💻</div>
+                    <h4>中栏：代码区</h4>
+                    <p style="font-size: 0.85rem;">编辑和预览你的内容</p>
+                    <div class="demo-frame" style="margin-top: 0.75rem; height: 120px; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div class="demo-header" style="padding: 5px 10px;">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                        </div>
+                        <div style="text-align: left; font-size: 0.75rem; padding: 10px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;"># 角色设定</div>
+                            <div style="margin-left: 10px;">- 姓名：小明</div>
+                            <div style="margin-left: 10px;">- 年龄：10岁</div>
+                            <div style="margin-left: 10px;">- 特点：勇敢、好奇</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬</div>
+                    <h4>右侧：对话</h4>
+                    <p style="font-size: 0.85rem;">与 AI 交流的地方</p>
+                    <div class="demo-frame" style="margin-top: 0.75rem; height: 120px; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div class="demo-header" style="padding: 5px 10px;">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                        </div>
+                        <div style="text-align: left; font-size: 0.75rem; padding: 10px;">
+                            <div style="margin-bottom: 5px;"><strong>你：</strong>帮我创建一个角色设定文件</div>
+                            <div><strong>AI：</strong>好的，我来帮你创建角色设定文件</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap); text-align: center;">
+                <p style="font-size: var(--body-size); color: var(--text-dark); font-weight: 600;">✨ 在 Builder 模式中，你可以管理文件、编辑内容、与 AI 交流，一站式完成创作！</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 12: Markdown魔法符号 ==================== -->
+    <section class="slide slide-12" data-slide="12">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-pink">Markdown</span>
+            </div>
+            <h2 class="reveal">三个魔法符号</h2>
+            <p class="subtitle reveal">记住这三个，今天够用了！</p>
+            <div class="grid-3 reveal">
+                <div class="card" style="text-align: center; border-top: 4px solid var(--badge-coral);">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin: 0.5rem 0;"># 标题</div>
+                    <div class="code-block-wrapper" style="margin: 0.5rem 0;">
+                        <div class="code-block" style="padding: 2rem 0.75rem 0.75rem; text-align: left; font-size: 0.8rem;"># 我的故事</div>
+                    </div>
+                    <p style="font-size: 0.8rem;">打 # 加空格<br>变成<strong>大标题</strong></p>
+                </div>
+                <div class="card" style="text-align: center; border-top: 4px solid var(--badge-mint);">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin: 0.5rem 0;">- 列表</div>
+                    <div class="code-block-wrapper" style="margin: 0.5rem 0;">
+                        <div class="code-block" style="padding: 2rem 0.75rem 0.75rem; text-align: left; font-size: 0.8rem;">- 苹果
+- 香蕉
+- 橘子</div>
+                    </div>
+                    <p style="font-size: 0.8rem;">每行前面打 -<br>变成<strong>列表</strong></p>
+                </div>
+                <div class="card" style="text-align: center; border-top: 4px solid var(--badge-pink);">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin: 0.5rem 0;">**加粗**</div>
+                    <div class="code-block-wrapper" style="margin: 0.5rem 0;">
+                        <div class="code-block" style="padding: 2rem 0.75rem 0.75rem; text-align: left; font-size: 0.8rem;">**重要内容**</div>
+                    </div>
+                    <p style="font-size: 0.8rem;">两对星号夹住<br>文字<strong>加粗</strong></p>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap);">
+                <p style="text-align: center; font-size: var(--h3-size); color: var(--text-dark);">🎯 学生实践：创建标题 → 生成列表 → 名字加粗</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 13: 三步定故事 ==================== -->
+    <section class="slide slide-13" data-slide="13">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-coral">分段二</span>
+                <span class="badge badge-yellow">30分钟</span>
+            </div>
+
+            <h1 class="reveal">三步定故事</h1>
+            <p class="subtitle reveal">好的故事要先做设计，像盖房子先画图纸</p>
+            <div class="grid-3 reveal" style="margin-top: 2rem;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--badge-coral);">1</div>
+                    <h4>选类型</h4>
+                    <p>你要写什么类型的故事？</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--badge-mint);">2</div>
+                    <h4>造角色</h4>
+                    <p>你的主角是谁？</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--badge-pink);">3</div>
+                    <h4>选地点</h4>
+                    <p>故事发生在哪里？</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 14: 第一步 选故事类型 ==================== -->
+    <section class="slide slide-14" data-slide="14">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-coral">第一步</span>
+                <span class="badge badge-yellow">8分钟</span>
+            </div>
+            <h2 class="reveal">选故事类型</h2>
+            <p class="subtitle reveal">凭你的第一感觉选，不用纠结！</p>
+            <div class="story-types reveal">
+                <div class="story-type-card" style="background: linear-gradient(135deg, #fff9e6, #fff3cd);">
+                    <div class="story-icon" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e); font-size: 1.5rem;">🏫</div>
+                    <div class="story-type-name">校园奇遇</div>
+                    <p style="font-size: 0.7rem; margin-top: 0.25rem;">学校发生不可思议的事</p>
+                </div>
+                <div class="story-type-card" style="background: linear-gradient(135deg, #ffe6e6, #ffd4d4);">
+                    <div class="story-icon" style="background: linear-gradient(135deg, #ff7675, #d63031); color: white; font-size: 1.5rem;">🔮</div>
+                    <div class="story-type-name">魔法冒险</div>
+                    <p style="font-size: 0.7rem; margin-top: 0.25rem;">你拥有了神奇能力</p>
+                </div>
+                <div class="story-type-card" style="background: linear-gradient(135deg, #e6f3ff, #cce5ff);">
+                    <div class="story-icon" style="background: linear-gradient(135deg, #74b9ff, #0984e3); color: white; font-size: 1.5rem;">⏰</div>
+                    <div class="story-type-name">穿越时空</div>
+                    <p style="font-size: 0.7rem; margin-top: 0.25rem;">来到完全不同的时代</p>
+                </div>
+                <div class="story-type-card" style="background: linear-gradient(135deg, #e6fff0, #ccf5db);">
+                    <div class="story-icon" style="background: linear-gradient(135deg, #55efc4, #00b894); color: white; font-size: 1.5rem;">🦁</div>
+                    <div class="story-type-name">动物奇缘</div>
+                    <p style="font-size: 0.7rem; margin-top: 0.25rem;">突然能听懂动物说话</p>
+                </div>
+                <div class="story-type-card" style="background: linear-gradient(135deg, #f0e6ff, #e5d4f5);">
+                    <div class="story-icon" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white; font-size: 1.5rem;">🚀</div>
+                    <div class="story-type-name">科幻未来</div>
+                    <p style="font-size: 0.7rem; margin-top: 0.25rem;">生活在3000年的未来</p>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap);">
+                <div class="card-title">📝 在 Trae 里创建类型文件</div>
+                <div class="code-block-wrapper">
+                    <div class="code-block">帮我创建一个 Markdown 文件，标题叫"我的故事类型"。
+
+内容是：
+
+我选择的故事类型是：[你选的类型名称]
+
+我选这个类型是因为：[一句话，说说为什么]</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 15: 第二步 造角色 ==================== -->
+    <section class="slide slide-15" data-slide="15">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">第二步</span>
+                <span class="badge badge-yellow">12分钟</span>
+            </div>
+            <h2 class="reveal">造你的主角</h2>
+            <p class="subtitle reveal">每个好故事都有一个让人记住的主角</p>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title">📝 角色卡模板</div>
+                    <div class="code-block-wrapper">
+                        <div class="code-block">帮我创建一个 Markdown 文件，按照下面的模板填写我的角色设定：
+
+# 我的主角
+
+- **名字**：[你想的名字]
+- **身份**：[你选的身份]
+- **性格**：[选两个词]
+- **特殊能力或特点**：[一句话描述]</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌟 示范</div>
+                    <div class="role-illustration" style="margin-bottom: 0.75rem;">
+                        <div class="role-avatar">👦</div>
+                        <div style="font-weight: 700; color: var(--text-dark);">小星</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">小学生 · 好奇但胆小</div>
+                    </div>
+                    <div style="background: white; border-radius: 8px; padding: 0.75rem; font-size: 0.75rem; text-align: left;">
+                        <div style="font-weight: 700; margin-bottom: 0.25rem;">特殊能力：</div>
+                        <div>能听懂猫说话，但别人不知道 🐱</div>
+                    </div>
+                    <p style="margin-top: 0.75rem; font-size: var(--small-size);">💡 提示：每项只写一句话，越简单 AI 越容易理解</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 16: 第三步 选地点 ==================== -->
+    <section class="slide slide-16" data-slide="16">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-pink">第三步</span>
+                <span class="badge badge-yellow">7分钟</span>
+            </div>
+            <h2 class="reveal">选故事发生地</h2>
+            <p class="subtitle reveal">不同类型故事，发生的地方不一样</p>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title">📍 地点选项</div>
+                    <ul class="feature-list" style="font-size: var(--small-size);">
+                        <li><span class="icon">🏫</span><strong>校园奇遇：</strong>被施魔法的学校 / 地下秘密房间</li>
+                        <li><span class="icon">🔮</span><strong>魔法冒险：</strong>魔法学院 / 精灵森林 / 龙之岛</li>
+                        <li><span class="icon">⏰</span><strong>穿越时空：</strong>古代皇宫 / 恐龙时代 / 未来城市</li>
+                        <li><span class="icon">🦁</span><strong>动物奇缘：</strong>会说话的森林 / 海底王国 / 大草原</li>
+                        <li><span class="icon">🚀</span><strong>科幻未来：</strong>火星基地 / 机器人城市 / 太空飞船</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">📝 在 Trae 里告诉 AI</div>
+                    <div class="code-block-wrapper">
+                        <div class="code-block">在我的角色设定文件里，加上这两行：
+
+- **故事发生地**：[你选的地点]
+- **这个地方的特点**：[一句话描述]</div>
+                    </div>
+                    <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--badge-mint); border-radius: 8px; font-size: var(--small-size);">
+                        💡 <strong>示例：</strong>龙之岛 — "一个到处都是龙的神秘小岛，岛上有一座随时会喷火的火山 🌋"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 17: 分段三 小试牛刀 ==================== -->
+    <section class="slide slide-17" data-slide="17">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-coral">分段三</span>
+                <span class="badge badge-yellow">15分钟</span>
+            </div>
+            <h2 class="reveal">小试牛刀</h2>
+            <p class="subtitle reveal">让 AI 根据你的设定，写出故事的开头</p>
+            <div class="grid-2 reveal">
+                <div class="card">
+                    <div class="card-title">🎯 预设误概念</div>
+                    <p>"AI 写的第一版就是最终版，不用改"</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px;">
+                        <strong>✓ 提醒学生：</strong>这只是"试写"，像画画前先打草稿，不满意可以改
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📝 让 AI 生成开头</div>
+                    <div class="code-block-wrapper">
+                        <div class="code-block">请根据我之前创建的设定（故事类型和角色设定），写一个故事的开头，200字以内。要求：
+
+1. 在开头就让读者想继续看下去
+2. 用 Markdown 格式排版</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card reveal" style="margin-top: var(--content-gap); background: var(--badge-lavender);">
+                <p style="color: var(--text-dark); font-weight: 600; text-align: center;">📝 核心任务：生成故事开头 + 练习"一句话改稿"</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 18: 一句话改稿 ==================== -->
+    <section class="slide slide-18" data-slide="18">
+        <div class="slide-content">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">小游戏</span>
+            </div>
+            <h2 class="reveal">一句话改稿</h2>
+            <p class="subtitle reveal">用你的话指挥 AI，说得越清楚，AI 做得越好</p>
+            <div class="card reveal">
+                <div class="card-title">📝 可以提的修改意见</div>
+                <div class="grid-2" style="margin-top: 1rem;">
+                    <ul class="feature-list">
+                        <li><span class="icon">💬</span>"开头太平了，我想要更紧张刺激一点"</li>
+                        <li><span class="icon">✏️</span>"主角的名字它写错了"</li>
+                    </ul>
+                    <ul class="feature-list">
+                        <li><span class="icon">🎭</span>"我想让开头有一段对话"</li>
+                        <li><span class="icon">🖼️</span>"描写太少了，我想要更多细节"</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="grid-2 reveal" style="margin-top: var(--content-gap);">
+                <div class="card" style="border-left: 4px solid var(--badge-coral);">
+                    <div class="card-title">❌ 模糊的说法</div>
+                    <p>"改好一点"、"不好看"、"再改改"</p>
+                    <p style="font-size: var(--small-size); margin-top: 0.5rem;">→ AI 不知道你到底要什么</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--badge-mint);">
+                    <div class="card-title">✓ 具体的说法</div>
+                    <p>"让主角一开始就出场"、"开头要更紧张"</p>
+                    <p style="font-size: var(--small-size); margin-top: 0.5rem;">→ AI 能准确理解并修改</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 19: 第三幕 反思 ==================== -->
+    <section class="slide slide-19" data-slide="19">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-lavender">第三幕</span>
+                <span class="badge badge-mint">10分钟</span>
+            </div>
+
+            <h1 class="reveal">反思 Contemplate</h1>
+            <p class="subtitle reveal">分享你的故事</p>
+            <div class="grid-2 reveal" style="max-width: 900px; width: 100%; margin-top: 2rem;">
+                <div class="card" style="text-align: left;">
+                    <div class="card-title">🎤 分享内容</div>
+                    <ul class="numbered-list">
+                        <li>你的故事是什么类型的？</li>
+                        <li>主角叫什么名字，有什么特点？</li>
+                        <li>故事发生在哪里？</li>
+                        <li>AI 写的开头你满意吗？</li>
+                    </ul>
+                </div>
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🗣️</div>
+                    <h3>分享要求</h3>
+                    <p>请 3-5 位同学分享</p>
+                    <p style="font-size: var(--small-size);">每人 1-2 分钟</p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--badge-mint); border-radius: 8px; width: 100%;">
+                        <p style="font-size: var(--small-size);">💡 分享时要声音洪亮，让全班都能听到</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 20: 第四幕 延续 ==================== -->
+    <section class="slide slide-20" data-slide="20">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-lavender">第四幕</span>
+                <span class="badge badge-mint">5分钟</span>
+            </div>
+            <div style="font-size: 5rem; margin: 1rem 0;" class="reveal">🚀</div>
+            <h1 class="reveal">延续 Continue</h1>
+            <p class="subtitle reveal">今天我们做了三件事</p>
+            <div class="grid-3 reveal" style="margin-top: 2rem;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛠️</div>
+                    <h4>认识 Trae</h4>
+                    <p>它不只能写故事，以后做网站、做游戏、做 App 都用它</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✨</div>
+                    <h4>Markdown 符号</h4>
+                    <p>井号变标题、短横线变列表、星号加粗</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📖</div>
+                    <h4>设计故事骨架</h4>
+                    <p>知道写什么类型、主角是谁、故事在哪发生</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 21: 下节课预告 ==================== -->
+    <section class="slide slide-21" data-slide="21">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-yellow">下节课预告</span>
+            </div>
+            <h2 class="reveal">AICODE03-05 我是大作家（下）</h2>
+            <p class="subtitle reveal">从大纲到完整故事</p>
+            <div class="card reveal" style="max-width: 600px; margin-top: 2rem;">
+                <p style="font-size: var(--h3-size); color: var(--text-dark); font-weight: 600;">📝 重点：AI 会根据你今天的设定，帮你一章一章地写出来！</p>
+            </div>
+            <div class="card reveal" style="max-width: 600px; margin-top: 1rem;">
+                <p>你是导演，AI 是你的编剧——你来指挥它怎么写</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SLIDE 22: 结束页 ==================== -->
+    <section class="slide slide-22" data-slide="22">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="badge-container reveal">
+                <span class="badge badge-mint">5分钟日常挑战</span>
+            </div>
+            <h2 class="reveal">本周挑战：我的_____百科</h2>
+            <div class="card reveal" style="max-width: 700px; text-align: left; margin-top: 2rem;">
+                <p>回家后，用你熟悉的 AI 聊天工具，写一段关于你最喜欢的_____（动物/食物/运动/游戏）的百科介绍。</p>
+                <p style="margin-top: 1rem;"><strong>要求：</strong></p>
+                <ul class="feature-list" style="margin-top: 0.5rem;">
+                    <li><span class="icon">1️⃣</span>100字以内</li>
+                    <li><span class="icon">2️⃣</span>试着用 Markdown 的 # 写一个标题</li>
+                    <li><span class="icon">3️⃣</span>内容要包含至少 3 个事实</li>
+                </ul>
+            </div>
+            <p class="reveal" style="margin-top: 2rem; color: var(--text-secondary);">下节课开头，愿意的同学可以分享！</p>
+
+            <!-- Achievement Illustration -->
+            <div class="svg-illustration reveal float-animation" style="max-width: 200px; margin: 1.5rem auto;">
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background -->
+                    <circle cx="100" cy="100" r="90" fill="#c8f0d8" opacity="0.5"/>
+
+                    <!-- Trophy/Base -->
+                    <rect x="70" y="140" width="60" height="20" rx="5" fill="#fdcb6e" stroke="#1a1a1a" stroke-width="2"/>
+                    <rect x="80" y="120" width="40" height="25" rx="3" fill="#ffeaa7" stroke="#1a1a1a" stroke-width="2"/>
+
+                    <!-- Trophy Cup -->
+                    <path d="M 60 60 Q 60 100 100 110 Q 140 100 140 60" fill="#ffeaa7" stroke="#1a1a1a" stroke-width="2"/>
+                    <path d="M 60 60 L 140 60" stroke="#1a1a1a" stroke-width="2"/>
+                    <rect x="85" y="40" width="30" height="25" rx="3" fill="#fdcb6e" stroke="#1a1a1a" stroke-width="2"/>
+
+                    <!-- Handles -->
+                    <path d="M 60 70 Q 45 70 45 85 Q 45 100 60 95" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+                    <path d="M 140 70 Q 155 70 155 85 Q 155 100 140 95" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+
+                    <!-- Stars -->
+                    <text x="50" y="60" font-size="20" fill="#f0b4d4">✦</text>
+                    <text x="145" y="50" font-size="18" fill="#c8f0d8">✦</text>
+                    <text x="40" y="100" font-size="16" fill="#f0f0c8">✦</text>
+                    <text x="155" y="110" font-size="20" fill="#f0d4e0">✦</text>
+                    <text x="100" y="35" font-size="24" fill="#fdcb6e">✦</text>
+
+                    <!-- Sparkles -->
+                    <circle cx="45" cy="130" r="4" fill="#c8f0d8"/>
+                    <circle cx="160" cy="140" r="3" fill="#f0b4d4"/>
+                    <circle cx="50" cy="155" r="5" fill="#f0f0c8"/>
+                </svg>
+            </div>
+
+            <div style="margin-top: 1rem;" class="reveal">
+                <h3>今天的任务完成了！</h3>
+                <p>别忘了保存好你的文件！</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">← → 方向键或空格键切换幻灯片</div>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.progressBar = document.getElementById('progressBar');
+                this.navDots = document.getElementById('navDots');
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                            this.updateProgressBar();
+                            this.updateNavDots();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable')) return;
+
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let touchStartY = 0;
+                let touchEndY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleSwipe(touchStartY, touchEndY);
+                });
+            }
+
+            handleSwipe(startY, endY) {
+                const threshold = 50;
+                const diff = startY - endY;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        this.nextSlide();
+                    } else {
+                        this.prevSlide();
+                    }
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            setupProgressBar() {
+                this.updateProgressBar();
+            }
+
+            updateProgressBar() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progressBar.style.width = progress + '%';
+                
+                // 更新页码显示
+                const pageNumberElement = document.getElementById('pageNumber');
+                if (pageNumberElement) {
+                    pageNumberElement.textContent = `${this.currentSlide + 1} / ${this.totalSlides}`;
+                }
+            }
+
+            setupNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+        }
+
+        /* ===========================================
+           CODE COPY CONTROLLER
+           =========================================== */
+        class CodeCopy {
+            constructor() {
+                this.setupCopyButtons();
+            }
+
+            setupCopyButtons() {
+                // Add copy buttons to all code blocks
+                const codeBlocks = document.querySelectorAll('.code-block');
+                codeBlocks.forEach(block => {
+                    const wrapper = block.closest('.code-block-wrapper') || block.parentElement;
+
+                    const btn = document.createElement('button');
+                    btn.className = 'copy-btn';
+                    btn.innerHTML = '📋 复制';
+                    btn.addEventListener('click', () => this.copyCode(block, btn));
+
+                    wrapper.style.position = 'relative';
+                    wrapper.appendChild(btn);
+                });
+            }
+
+            async copyCode(block, btn) {
+                const code = block.textContent;
+
+                try {
+                    await navigator.clipboard.writeText(code);
+                    btn.innerHTML = '✓ 已复制';
+                    btn.classList.add('copied');
+
+                    setTimeout(() => {
+                        btn.innerHTML = '📋 复制';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = code;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+
+                    try {
+                        document.execCommand('copy');
+                        btn.innerHTML = '✓ 已复制';
+                        btn.classList.add('copied');
+
+                        setTimeout(() => {
+                            btn.innerHTML = '📋 复制';
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    } catch (e) {
+                        btn.innerHTML = '❌ 失败';
+                        setTimeout(() => {
+                            btn.innerHTML = '📋 复制';
+                        }, 2000);
+                    }
+
+                    document.body.removeChild(textarea);
+                }
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING CONTROLLER
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.editToggle = document.getElementById('editToggle');
+                this.editHotzone = document.querySelector('.edit-hotzone');
+                this.notification = document.getElementById('editNotification');
+                this.editableElements = [];
+
+                this.setupEventListeners();
+                this.showInitialNotification();
+            }
+
+            setupEventListeners() {
+                // Toggle button click
+                this.editToggle.addEventListener('click', () => this.toggleEditMode());
+
+                // Hotzone click
+                this.editHotzone.addEventListener('click', () => this.toggleEditMode());
+
+                // Hotzone hover with grace period
+                let hideTimeout = null;
+
+                this.editHotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    this.editToggle.classList.add('show');
+                });
+
+                this.editHotzone.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.editToggle.classList.remove('show');
+                    }, 400);
+                });
+
+                this.editToggle.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                });
+
+                this.editToggle.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.editToggle.classList.remove('show');
+                    }, 400);
+                });
+
+                // Keyboard shortcut
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        e.preventDefault();
+                        this.toggleEditMode();
+                    }
+                });
+
+                // Auto-save on blur
+                document.addEventListener('blur', (e) => {
+                    if (e.target.getAttribute('contenteditable')) {
+                        this.saveToLocalStorage();
+                    }
+                }, true);
+            }
+
+            showInitialNotification() {
+                setTimeout(() => {
+                    this.notification.classList.add('show');
+                    setTimeout(() => {
+                        this.notification.classList.remove('show');
+                    }, 3000);
+                }, 1000);
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                this.editToggle.classList.toggle('active', this.isActive);
+
+                if (this.isActive) {
+                    this.enableEditing();
+                    this.notification.textContent = '编辑模式已开启！点击文字即可编辑';
+                    this.notification.classList.add('show');
+                    setTimeout(() => this.notification.classList.remove('show'), 2000);
+                } else {
+                    this.disableEditing();
+                    this.saveToLocalStorage();
+                    this.notification.textContent = '编辑已保存！';
+                    this.notification.classList.add('show');
+                    setTimeout(() => this.notification.classList.remove('show'), 2000);
+                }
+            }
+
+            enableEditing() {
+                const selectors = 'h1, h2, h3, h4, p, li';
+                this.editableElements = document.querySelectorAll(selectors);
+                this.editableElements.forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                });
+            }
+
+            disableEditing() {
+                this.editableElements.forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+            }
+
+            saveToLocalStorage() {
+                const content = {};
+                this.slides = document.querySelectorAll('.slide');
+                this.slides.forEach((slide, index) => {
+                    content[index] = slide.innerHTML;
+                });
+                localStorage.setItem('slide-presentation-content', JSON.stringify(content));
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+            new InlineEditor();
+            new CodeCopy();
+        });
+    </script>
+</body>
+</html>
