@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICODE-03: 我是大作家（完结篇）交互课件</title>
+    <style>
+        /* ===========================================
+           VIEWPORT BASE STYLES (MANDATORY)
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            width: 100vw;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            /* 移除谷歌字体，使用系统原生高清字体，确保国内秒开无白屏 */
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: var(--slide-padding);
+            min-height: 100%;
+            position: relative;
+        }
+
+        /* ===========================================
+           THEME VARIABLES - Author's Journey Theme
+           =========================================== */
+        :root {
+            /* 温暖的书卷色调 */
+            --bg-cream: #faf8f5;
+            --bg-warm: #f5f0e8;
+            --bg-rose: #f8f0f0;
+            --bg-sage: #f0f5f0;
+
+            /* 主色调 - 文学感的深紫与暖金 */
+            --primary: #6b4c7a;
+            --primary-light: #9b7cb0;
+            --accent-gold: #d4a574;
+            --accent-rose: #c9a0a0;
+            --accent-sage: #8fa88f;
+
+            /* 文字色 */
+            --text-dark: #2d2a26;
+            --text-secondary: #5a5855;
+            --text-muted: #8a8680;
+
+            /* 卡片背景 */
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(107, 76, 122, 0.15);
+
+            /* 徽章色 */
+            --badge-gold: #f5e6d3;
+            --badge-rose: #f0e0e0;
+            --badge-sage: #e0f0e0;
+            --badge-lavender: #e8e0f0;
+
+            /* Typography */
+            --title-size: clamp(2.2rem, 5vw, 3.8rem);
+            --h2-size: clamp(1.6rem, 3.5vw, 2.6rem);
+            --h3-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.95rem, 1.6vw, 1.15rem);
+            --small-size: clamp(0.85rem, 1.2vw, 1rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.2rem, 3vw, 2rem);
+            --content-gap: clamp(0.6rem, 1.5vw, 1rem);
+            --element-gap: clamp(0.4rem, 0.8vw, 0.6rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        * { box-sizing: border-box; }
+
+        /* ===========================================
+           SLIDE BACKGROUNDS - Rotating warm tones
+           =========================================== */
+        .slide-1 { background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-rose) 100%); }
+        .slide-2 { background: linear-gradient(135deg, var(--bg-rose) 0%, var(--bg-warm) 100%); }
+        .slide-3 { background: linear-gradient(135deg, var(--bg-warm) 0%, var(--bg-sage) 100%); }
+        .slide-4 { background: linear-gradient(135deg, var(--bg-sage) 0%, var(--bg-cream) 100%); }
+        .slide-5 { background: linear-gradient(135deg, var(--bg-cream) 0%, #f0f0f8 100%); }
+        .slide-6, .slide-10, .slide-13 { background: linear-gradient(135deg, #f0f0f8 0%, var(--bg-rose) 100%); }
+        .slide-7, .slide-11, .slide-13 { background: linear-gradient(135deg, var(--bg-rose) 0%, var(--bg-warm) 100%); }
+        .slide-8, .slide-12, .slide-20 { background: linear-gradient(135deg, var(--bg-warm) 0%, var(--bg-sage) 100%); }
+        .slide-9, .slide-13, .slide-21 { background: linear-gradient(135deg, var(--bg-sage) 0%, var(--bg-cream) 100%); }
+        .slide-22 { background: linear-gradient(135deg, var(--bg-cream) 0%, #f8f5f0 100%); }
+        .slide-23 { background: linear-gradient(135deg, #f8f5f0 0%, var(--bg-rose) 100%); }
+        .slide-23 { background: linear-gradient(135deg, var(--primary) 0%, #4a3655 100%); }
+
+        /* ===========================================
+           MAIN CARD CONTAINER
+           =========================================== */
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: clamp(1.25rem, 3vw, 2rem);
+            box-shadow: 0 15px 50px rgba(107, 76, 122, 0.1);
+            max-width: min(96vw, 1200px);
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+            border: 1px solid var(--card-border);
+        }
+
+        /* 书卷装饰侧边栏 */
+        .book-spine {
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .spine-section {
+            width: 36px;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: clamp(0.5rem, 0.8vh, 0.65rem);
+            font-weight: 700;
+            color: white;
+            padding: 10px 0;
+            box-shadow: -3px 0 8px rgba(0,0,0,0.1);
+        }
+
+        .spine-1 { height: 55px; background: var(--accent-gold); }
+        .spine-2 { height: 75px; background: var(--primary); }
+        .spine-3 { height: 65px; background: var(--accent-rose); }
+        .spine-4 { height: 60px; background: var(--accent-sage); }
+
+        @media (max-width: 768px) {
+            .book-spine { display: none; }
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 900;
+            color: var(--text-dark);
+            line-height: 1.15;
+            margin: 0 0 var(--element-gap) 0;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+            margin: 0 0 var(--element-gap) 0;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.3;
+            margin: 0 0 var(--element-gap) 0;
+        }
+
+        h4 {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 700;
+            margin: 0 0 0.4rem 0;
+            color: var(--text-dark);
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0 0 var(--element-gap) 0;
+        }
+
+        p:last-child, li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===========================================
+           COMPONENTS
+           =========================================== */
+        .badge-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: var(--small-size);
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge-gold { background: var(--badge-gold); }
+        .badge-rose { background: var(--badge-rose); }
+        .badge-sage { background: var(--badge-sage); }
+        .badge-lavender { background: var(--badge-lavender); }
+        .badge-primary { background: var(--primary); color: white; }
+
+        .subtitle {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            margin-bottom: var(--content-gap);
+            max-width: 550px;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: var(--element-gap);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(107, 76, 122, 0.06);
+            border: 1px solid var(--card-border);
+            overflow: visible;
+        }
+
+        .card > *:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-title {
+            font-size: var(--body-size);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--element-gap);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .card-icon {
+            font-size: 1.2em;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(107, 76, 122, 0.08);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            line-height: 1.5;
+            font-size: var(--small-size);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list .icon {
+            font-size: 1em;
+            flex-shrink: 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--content-gap);
+            align-items: start;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--content-gap);
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Numbered list */
+        .numbered-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            counter-reset: item;
+        }
+
+        .numbered-list li {
+            counter-increment: item;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: var(--small-size);
+        }
+
+        .numbered-list li::before {
+            content: counter(item);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            background: var(--badge-gold);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: var(--small-size);
+            flex-shrink: 0;
+            color: var(--text-dark);
+        }
+
+        /* Workflow */
+        .workflow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: var(--content-gap) 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: var(--card-bg);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: var(--small-size);
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 2px 8px rgba(107, 76, 122, 0.08);
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Code block */
+        .code-block-wrapper {
+            position: relative;
+            margin: var(--element-gap) 0;
+        }
+
+        .code-block {
+            background: #2d2a26;
+            border-radius: 10px;
+            padding: 1.25rem;
+            padding-top: 1.75rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+            color: #f5f0e8;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            max-width: 100%;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .copy-btn.copied {
+            background: var(--badge-sage);
+            color: var(--text-dark);
+            border-color: var(--badge-sage);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--primary));
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        /* Navigation dots */
+        .nav-dots {
+            position: fixed;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(107, 76, 122, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        @media (max-width: 768px) {
+            .nav-dots { display: none; }
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-muted);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .keyboard-hint { display: none; }
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.08s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.16s; }
+        .reveal:nth-child(4) { transition-delay: 0.2s; }
+        .reveal:nth-child(5) { transition-delay: 0.24s; }
+        .reveal:nth-child(6) { transition-delay: 0.28s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+
+        /* ===========================================
+           SPECIAL COMPONENTS
+           =========================================== */
+        .scene-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--content-gap);
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .scene-container { grid-template-columns: 1fr; }
+        }
+
+        .scene-card {
+            padding: 0.9rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(107, 76, 122, 0.06);
+        }
+
+        .scene-card.scene-a {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            border-top: 3px solid var(--accent-sage);
+        }
+
+        .scene-card.scene-b {
+            background: linear-gradient(135deg, #fdf8e8 0%, #f8f5e0 100%);
+            border-top: 3px solid var(--accent-gold);
+        }
+
+        .scene-card.scene-c {
+            background: linear-gradient(135deg, #f8f0f0 0%, #f5e8e8 100%);
+            border-top: 3px solid var(--accent-rose);
+        }
+
+        .scene-card h4 {
+            font-size: var(--small-size);
+            margin-bottom: 0.4rem;
+        }
+
+        .scene-card.scene-a h4 { color: #4a7c4a; }
+        .scene-card.scene-b h4 { color: #8c6b3d; }
+        .scene-card.scene-c h4 { color: #8c4a4a; }
+
+        .scene-card p {
+            font-size: var(--small-size);
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, #fdf6e8 0%, #f8f0e0 100%);
+            border: 2px dashed var(--accent-gold);
+            padding: 0.9rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .challenge-card h4 {
+            color: #8c6b3d;
+            margin-top: 0;
+            margin-bottom: 0.4rem;
+            font-size: var(--body-size);
+        }
+
+        .challenge-card p {
+            font-size: var(--small-size);
+            margin: 0;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #f8f5ff 0%, #f3f0f8 100%);
+            border-radius: 10px;
+            padding: 0.9rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .tip-box h4 {
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            font-size: var(--body-size);
+        }
+
+        .tip-box p {
+            font-size: var(--small-size);
+            margin: 0;
+        }
+
+        .two-column {
+            display: flex;
+            gap: var(--content-gap);
+            align-items: stretch;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column > * {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .two-column { flex-direction: column; }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 0.6rem;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .feature-item .emoji {
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .feature-item h4 {
+            font-size: var(--small-size);
+            margin-bottom: 0.2rem;
+        }
+
+        .feature-item p {
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .cover-icon {
+            font-size: clamp(4rem, 10vw, 6rem);
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .cover-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .cover-meta span {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+        }
+
+        .book-structure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .structure-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid var(--card-border);
+            min-width: 100px;
+        }
+
+        .structure-item .emoji {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .structure-item h4 {
+            font-size: var(--small-size);
+            margin-bottom: 0.2rem;
+        }
+
+        .structure-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        .slide-21 .main-card {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .slide-21 h1,
+        .slide-21 h2 {
+            color: var(--primary);
+        }
+
+        .speech-bubble {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem;
+            position: relative;
+            margin-bottom: var(--element-gap);
+            box-shadow: 0 4px 15px rgba(107, 76, 122, 0.08);
+            border: 1px solid var(--card-border);
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid white;
+        }
+
+        .speech-bubble.teacher {
+            background: linear-gradient(135deg, #f8f5ff 0%, #f3f0f8 100%);
+            border-left: 4px solid var(--primary);
+        }
+
+        .speech-bubble.teacher::before {
+            border-right-color: #f8f5ff;
+        }
+
+        /* Interactive Quiz */
+        .quiz-option {
+            background: white;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-light);
+            transform: translateX(5px);
+            box-shadow: 0 3px 12px rgba(107, 76, 122, 0.1);
+        }
+
+        .quiz-option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .quiz-letter {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--badge-lavender);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .quiz-option.correct .quiz-letter {
+            background: #22c55e;
+            color: white;
+        }
+
+        .quiz-option.wrong .quiz-letter {
+            background: #ef4444;
+            color: white;
+        }
+
+        .quiz-feedback {
+            margin-top: 0.8rem;
+            padding: 0.9rem;
+            border-radius: 10px;
+            font-size: var(--small-size);
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-feedback.correct {
+            background: #f0fdf4;
+            border-left: 3px solid #22c55e;
+            color: #166534;
+        }
+
+        .quiz-feedback.wrong {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            color: #991b1b;
+        }
+
+        /* 3D Flip Cards */
+        .flip-card-container {
+            perspective: 1000px;
+            height: 160px;
+            cursor: pointer;
+        }
+
+        .flip-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card-container.flipped .flip-card {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid var(--accent-gold);
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #22c55e;
+            transform: rotateY(180deg);
+        }
+
+        .flip-hint {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.8);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Typewriter */
+        .typewriter-container {
+            background: #1e1b18;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: var(--element-gap) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .typewriter-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 0.8rem;
+        }
+
+        .typewriter-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .typewriter-dot.red { background: #ff5f56; }
+        .typewriter-dot.yellow { background: #ffbd2e; }
+        .typewriter-dot.green { background: #27ca40; }
+
+        .typewriter-content {
+            font-family: 'SF Mono', monospace;
+            font-size: clamp(0.85rem, 1.3vw, 1rem);
+            color: #a8d4c4;
+            line-height: 1.8;
+            min-height: 80px;
+        }
+
+        .typewriter-placeholder {
+            color: #666;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background: #a8d4c4;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .typewriter-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0.8rem;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: #a8d4c4;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Timer */
+        .timer-container {
+            background: linear-gradient(135deg, var(--primary) 0%, #5a4065 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+            margin: var(--element-gap) 0;
+        }
+
+        .timer-display {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            font-family: 'SF Mono', monospace;
+            letter-spacing: 4px;
+            margin: 0.8rem 0;
+        }
+
+        .timer-display.warning {
+            color: #ffbd2e;
+            animation: pulse 1s infinite;
+        }
+
+        .timer-display.danger {
+            color: #ff5f56;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+
+        .timer-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 24px;
+            font-size: var(--small-size);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Random Picker */
+        .picker-container {
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-warm) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--card-border);
+        }
+
+        .picker-display {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--primary);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .picker-display.spinning {
+            animation: textSpin 0.1s infinite;
+        }
+
+        @keyframes textSpin {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .picker-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #5a4065 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2.5rem;
+            border-radius: 30px;
+            font-size: var(--body-size);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(107, 76, 122, 0.3);
+        }
+
+        .picker-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(107, 76, 122, 0.4);
+        }
+
+        .picker-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            top: -12px;
+            animation: confettiFall 3s linear forwards;
+            z-index: 9999;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <div class="progress-bar" id="progressBar"></div>
+        <div style="position: absolute; top: 6px; right: 15px; font-size: 11px; color: var(--text-secondary); font-weight: 600; padding: 3px 10px; background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <span id="pageNumber">1 / 20</span>
+        </div>
+    </div>
+
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <section class="slide slide-1 visible" data-slide="1">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="main-card" style="text-align: center;">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">封面</div>
+                    <div class="spine-section spine-2">写作</div>
+                    <div class="spine-section spine-3">路演</div>
+                    <div class="spine-section spine-4">完成</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">AI编程</span>
+                    <span class="badge badge-lavender">第6课</span>
+                    <span class="badge badge-rose">90分钟</span>
+                    <span class="badge badge-sage">完结篇</span>
+                </div>
+                <div class="cover-icon reveal">📚</div>
+                <h1 class="reveal" style="margin-bottom: 0.5rem;">我是大作家（完结篇）</h1>
+                <p class="subtitle reveal" style="max-width: 500px; margin: 0 auto;">从草稿到完整作品 — 封面设计、精彩片段、路演分享</p>
+
+                <div class="cover-meta reveal">
+                    <span>⏱️ 90分钟</span>
+                    <span>🎯 核心能力：表达力、审美力</span>
+                    <span>🛠️ 工具：Trae IDE、Markdown</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-2" data-slide="2">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">目标</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">课程目标</span>
+                </div>
+                <h2 class="reveal">学完这节课，你将能够...</h2>
+                <div class="grid-3 reveal">
+                    <div class="card">
+                        <div class="card-title"><span class="card-icon">📚</span>知识目标</div>
+                        <ul class="feature-list">
+                            <li><span class="icon">✓</span>理解"一本书"的完整结构</li>
+                            <li><span class="icon">✓</span>理解"精彩片段"的作用</li>
+                            <li><span class="icon">✓</span>理解路演的本质</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><span class="card-icon">💪</span>能力目标</div>
+                        <ul class="feature-list">
+                            <li><span class="icon">✓</span>设计完整故事文档（封面+正文）</li>
+                            <li><span class="icon">✓</span>选出最精彩段落并说明理由</li>
+                            <li><span class="icon">✓</span>完成2分钟作品路演</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><span class="card-icon">❤️</span>情感目标</div>
+                        <ul class="feature-list">
+                            <li><span class="icon">✓</span>体验"完成作品"的成就感</li>
+                            <li><span class="icon">✓</span>建立审美自信</li>
+                            <li><span class="icon">✓</span>感受分享的乐趣</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-3" data-slide="3">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">热身</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">互动热身</span>
+                </div>
+                <h2 class="reveal">快速问答：完整作品包含什么？</h2>
+                <p class="subtitle reveal">点击你认为正确的选项</p>
+
+                <div class="reveal" style="margin-top: 0.5rem;">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">
+                        <span class="quiz-letter">A</span>
+                        <span style="font-size: var(--small-size);">只有故事正文就够了</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">
+                        <span class="quiz-letter">B</span>
+                        <span style="font-size: var(--small-size);">封面 + 正文 + 作者的话</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">
+                        <span class="quiz-letter">C</span>
+                        <span style="font-size: var(--small-size);">只要写得长就行</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">
+                        <span class="quiz-letter">D</span>
+                        <span style="font-size: var(--small-size);">让AI决定一切</span>
+                    </div>
+                </div>
+
+                <div class="quiz-feedback" id="quizFeedback"></div>
+
+                <div class="speech-bubble teacher reveal" style="margin-top: 0.5rem;">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">就像产品需要完整包装，故事也需要有头有尾才算真正完成！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-4" data-slide="4">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-2">回顾</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-rose">上节课回顾</span>
+                </div>
+                <h2 class="reveal">第5课我们做了什么？</h2>
+
+                <div class="feature-grid reveal" style="margin-bottom: 1rem;">
+                    <div class="feature-item">
+                        <div class="emoji">🗺️</div>
+                        <h4>生成大纲</h4>
+                        <p>起承转合<br>四段式结构</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">✍️</div>
+                        <h4>逐章写作</h4>
+                        <p>指挥AI<br>一章一章写</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">✨</div>
+                        <h4>Markdown排版</h4>
+                        <p>##标题<br>>引用</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">📝</div>
+                        <h4>修改润色</h4>
+                        <p>加细节<br>改对话</p>
+                    </div>
+                </div>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;"><strong>老师：</strong>上节课大家都写了几章？故事有结尾了吗？今天我们要把这些变成一本"完整的书"！</p>
+                </div>
+
+                <div class="card reveal" style="background: linear-gradient(135deg, #f8f5ff 0%, #f3e8ff 100%); border-left: 3px solid var(--primary);">
+                    <p style="text-align: center; color: var(--primary); font-weight: 600; margin: 0;">💡 如果故事还没写完，今天前15分钟是最后冲刺时间！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-5" data-slide="5">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">结构</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">核心概念</span>
+                </div>
+                <h2 class="reveal">一本书的完整结构</h2>
+                <p class="subtitle reveal">就像产品要有完整包装，故事也要有头有尾</p>
+
+                <div class="book-structure reveal">
+                    <div class="structure-item" style="border-color: var(--accent-gold);">
+                        <div class="emoji">📕</div>
+                        <h4>封面</h4>
+                        <p style="font-size: 0.75rem; margin: 0;">书名、作者<br>简介、类型</p>
+                    </div>
+                    <div class="structure-arrow">→</div>
+                    <div class="structure-item" style="border-color: var(--primary); min-width: 140px;">
+                        <div class="emoji">📄</div>
+                        <h4>正文</h4>
+                        <p style="font-size: 0.75rem; margin: 0;">故事内容<br>起承转合</p>
+                    </div>
+                    <div class="structure-arrow">→</div>
+                    <div class="structure-item" style="border-color: var(--accent-rose);">
+                        <div class="emoji">💬</div>
+                        <h4>作者的话</h4>
+                        <p style="font-size: 0.75rem; margin: 0;">创作心得<br>最喜欢的一段</p>
+                    </div>
+                </div>
+
+                <div class="grid-2 reveal" style="margin-top: 1rem;">
+                    <div class="card" style="border-left: 3px solid #ef4444;">
+                        <div class="card-title">❌ 不完整</div>
+                        <p style="font-size: var(--small-size);">只有正文，没有封面和作者信息<br>像一堆纸，不像一本书</p>
+                    </div>
+                    <div class="card" style="border-left: 3px solid #22c55e;">
+                        <div class="card-title">✅ 完整作品</div>
+                        <p style="font-size: var(--small-size);">封面+正文+作者的话<br>有头有尾，可以"交付"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-6" data-slide="6">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">联系</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">第一幕 Connect</span>
+                    <span class="badge badge-gold">10分钟</span>
+                </div>
+                <h2 class="reveal">作品盘点</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">同学们，今天是"我是大作家"系列的最后一节课。老师来问问：你们的故事现在到哪一步了？</p>
+                </div>
+
+                <div class="card reveal">
+                    <h4 style="text-align: center; margin-bottom: 1rem;">举手告诉我你属于哪种状态：</h4>
+                    <div class="scene-container">
+                        <div class="scene-card scene-a">
+                            <h4>✅ 状态一</h4>
+                            <p>故事全部写完了，有完整结尾</p>
+                        </div>
+                        <div class="scene-card scene-b">
+                            <h4>⏳ 状态二</h4>
+                            <p>大纲有了，但章节还没写完</p>
+                        </div>
+                    </div>
+                    <div class="scene-container" style="margin-top: var(--content-gap);">
+                        <div class="scene-card scene-c">
+                            <h4>📝 状态三</h4>
+                            <p>还在写第一章或刚开始</p>
+                        </div>
+                        <div class="card" style="background: linear-gradient(135deg, #f8f5ff 0%, #f3e8ff 100%);">
+                            <p style="text-align: center; margin: 0; color: var(--primary);"><strong>无论你在哪个阶段，今天结束前都要交出一件"完整的作品"</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scene-container reveal" style="margin-top: 1rem;">
+                    <div class="flip-card-container" onclick="flipCard(this)">
+                        <div class="flip-card">
+                            <div class="flip-card-front">
+                                <span class="flip-hint">点击翻转 👆</span>
+                                <h4 style="color: #92400e;">❌ 误概念</h4>
+                                <p style="font-size: var(--small-size);">"故事写完就算完成了"</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <h4 style="color: #166534;">✅ 正确认知</h4>
+                                <p style="font-size: var(--small-size);">故事写完只是初稿，封面+排版+作者信息才是"完整作品"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card-container" onclick="flipCard(this)">
+                        <div class="flip-card">
+                            <div class="flip-card-front">
+                                <span class="flip-hint">点击翻转 👆</span>
+                                <h4 style="color: #92400e;">❌ 误概念</h4>
+                                <p style="font-size: var(--small-size);">"封面让AI写就好"</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <h4 style="color: #166534;">✅ 正确认知</h4>
+                                <p style="font-size: var(--small-size);">书名、作者、主角、类型，只有你能决定</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-7" data-slide="7">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-2">建构</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">第二幕 Construct</span>
+                    <span class="badge badge-gold">65分钟</span>
+                </div>
+                <h2 class="reveal">今天我们要做三件事</h2>
+
+                <div class="workflow reveal" style="margin: 1.5rem 0;">
+                    <div class="flow-step">冲刺补写<br><small>15分钟</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">封面设计<br><small>20分钟</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">路演分享<br><small>30分钟</small></div>
+                </div>
+
+                <div class="feature-grid reveal">
+                    <div class="feature-item">
+                        <div class="emoji">🏃</div>
+                        <h4>冲刺补写</h4>
+                        <p>没写完的用15分钟<br>把结尾补上</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">📕</div>
+                        <h4>封面设计</h4>
+                        <p>用Markdown做<br>漂亮封面页</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">🎤</div>
+                        <h4>精彩片段</h4>
+                        <p>选出最精彩的<br>一段准备朗读</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">⭐</div>
+                        <h4>路演分享</h4>
+                        <p>每人2分钟<br>介绍你的作品</p>
+                    </div>
+                </div>
+
+                <div class="speech-bubble teacher reveal" style="margin-top: 1rem;">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">敢分享的人，才算真正"发布"了自己的作品。今天每个人都要站起来分享一次！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-8" data-slide="8">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-2">补写</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">分段一</span>
+                    <span class="badge badge-gold">15分钟</span>
+                </div>
+                <h2 class="reveal">冲刺补写</h2>
+
+                <div class="two-column reveal">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">📝 故事未完成的同学</div>
+                            <p style="font-size: var(--small-size);">只有一个任务：<strong>把剩下的章节写完</strong></p>
+                            <p style="font-size: var(--small-size);">不要求好，只要求完整。哪怕最后一章只有两句话结尾，也算完整。</p>
+                        </div>
+
+                        <div class="tip-box">
+                            <h4>💡 让AI帮你写结尾</h4>
+                            <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                                <div class="code-block" style="padding: 1rem; font-size: 0.8rem;">我的故事写到了第X章，请帮我用3-5句话写一个简短的结尾，让故事有个交代，不要拖太长。风格跟前面的内容保持一致。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">✅ 故事已写完的同学</div>
+                            <p style="font-size: var(--small-size);">做一件事：<strong>通读全文</strong>，找出你觉得"最精彩"的那一段</p>
+                            <p style="font-size: var(--small-size);">用 <code>**</code> 把那段加粗标注出来，方便等会儿路演时找到。</p>
+                        </div>
+
+                        <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #e8f8e8 100%); border-left: 3px solid #22c55e;">
+                            <p style="font-size: var(--small-size); margin: 0;"><strong>选精彩片段的标准：</strong></p>
+                            <ul class="feature-list" style="margin-top: 0.5rem;">
+                                <li><span class="icon">1️⃣</span>读起来最顺，不卡</li>
+                                <li><span class="icon">2️⃣</span>有画面感，身临其境</li>
+                                <li><span class="icon">3️⃣</span>关键转折，让人想继续</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-9" data-slide="9">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">AI演示</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">互动演示</span>
+                </div>
+                <h2 class="reveal">看AI如何帮你写结尾</h2>
+                <p class="subtitle reveal">点击"开始演示"观看AI实时写作过程</p>
+
+                <div class="typewriter-container reveal">
+                    <div class="typewriter-header">
+                        <span class="typewriter-dot red"></span>
+                        <span class="typewriter-dot yellow"></span>
+                        <span class="typewriter-dot green"></span>
+                        <span style="margin-left: auto; font-size: 0.75rem; color: #666;">Trae Builder</span>
+                    </div>
+                    <div class="typewriter-content" id="typewriterContent">
+                        <span class="typewriter-placeholder">点击"开始演示"看AI如何帮你写故事结尾...</span>
+                        <span class="typewriter-cursor"></span>
+                    </div>
+                    <div class="typewriter-status" id="typewriterStatus" style="display: none;">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span>AI正在写作...</span>
+                    </div>
+                </div>
+
+                <div class="timer-controls reveal">
+                    <button class="timer-btn" onclick="startTypewriterDemo()">▶️ 开始演示</button>
+                    <button class="timer-btn" onclick="resetTypewriter()">🔄 重置</button>
+                </div>
+
+                <div class="speech-bubble teacher reveal" style="margin-top: 0.5rem;">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">看到了吗？只要给AI明确的指令，它就能帮你快速完成故事结尾！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-10" data-slide="10">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-3">封面</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">分段二</span>
+                    <span class="badge badge-gold">20分钟</span>
+                </div>
+                <h2 class="reveal">封面设计 + 作者的话</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">你们喜欢的漫画或小说，第一页都有什么？对，书名、作者、介绍。今天我们就用Markdown做一个文字封面。</p>
+                </div>
+
+                <div class="two-column reveal" style="margin-top: 1rem;">
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">📕 封面页模板</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.8rem;"># 【书名】
+
+**作者：** 你的名字
+**类型：** 魔法冒险 / 校园奇遇
+**主角：** 一句话描述主角
+**故事简介：** 两句话说清楚
+
+---</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="card">
+                            <div class="card-title">💬 作者的话模板</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.8rem;">## 作者的话
+
+写这个故事的时候，我想到了……
+
+我最喜欢的一段是第X章，
+因为……
+
+—— 【你的名字】，2026年</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box reveal">
+                    <h4>💻 操作提示</h4>
+                    <p>让AI帮你插入封面："帮我在故事文件的最开头，插入一个Markdown格式的封面页。信息如下..."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-11" data-slide="11">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-4">片段</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">分段三</span>
+                    <span class="badge badge-gold">15分钟</span>
+                </div>
+                <h2 class="reveal">精彩片段 + 整理排版</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">路演时你要读一段"精彩片段"——大概30秒到1分钟。不要让AI替你选，你来选！</p>
+                </div>
+
+                <div class="grid-3 reveal" style="margin-top: 1rem;">
+                    <div class="card" style="border-top: 3px solid var(--accent-gold);">
+                        <h4 style="color: #8c6b3d;">标准一</h4>
+                        <p style="font-size: var(--small-size);">这段读起来最顺，不卡</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--primary);">
+                        <h4 style="color: var(--primary);">标准二</h4>
+                        <p style="font-size: var(--small-size);">描写了一个画面，身临其境</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--accent-rose);">
+                        <h4 style="color: #8c4a4a;">标准三</h4>
+                        <p style="font-size: var(--small-size);">关键转折，让人想继续听</p>
+                    </div>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem;">
+                    <div class="card-title">📝 操作步骤</div>
+                    <ol class="numbered-list">
+                        <li>通读全文，挑选精彩片段</li>
+                        <li>把精彩片段复制到文件末尾</li>
+                        <li>加 <code>## 精彩片段</code> 标题</li>
+                        <li>检查章节标题是否都有 <code>##</code></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-12" data-slide="12">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-4">路演</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-sage">分段四</span>
+                    <span class="badge badge-gold">15分钟</span>
+                </div>
+                <h2 class="reveal">路演准备</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">路演不是背课文，是聊自己的作品。你比任何人都熟悉它。老师先示范一遍！</p>
+                </div>
+
+                <div class="card reveal" style="background: linear-gradient(135deg, #f8f5ff 0%, #f3e8ff 100%); border: 2px solid var(--primary);">
+                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">🎤 路演提示卡（5步）</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <div style="background: white; padding: 0.6rem 1rem; border-radius: 8px; border-left: 3px solid var(--accent-gold);">
+                            <p style="margin: 0; font-size: var(--small-size);"><strong>1.</strong> 我的作品叫《____》</p>
+                        </div>
+                        <div style="background: white; padding: 0.6rem 1rem; border-radius: 8px; border-left: 3px solid var(--primary-light);">
+                            <p style="margin: 0; font-size: var(--small-size);"><strong>2.</strong> 故事讲的是……（一句话）</p>
+                        </div>
+                        <div style="background: white; padding: 0.6rem 1rem; border-radius: 8px; border-left: 3px solid var(--primary);">
+                            <p style="margin: 0; font-size: var(--small-size);"><strong>3.</strong> 接下来请听精彩片段——（读一段，1分钟内）</p>
+                        </div>
+                        <div style="background: white; padding: 0.6rem 1rem; border-radius: 8px; border-left: 3px solid var(--accent-rose);">
+                            <p style="margin: 0; font-size: var(--small-size);"><strong>4.</strong> 我最喜欢这段，因为……</p>
+                        </div>
+                        <div style="background: white; padding: 0.6rem 1rem; border-radius: 8px; border-left: 3px solid var(--accent-sage);">
+                            <p style="margin: 0; font-size: var(--small-size);"><strong>5.</strong> 谢谢！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="challenge-card reveal" style="margin-top: 1rem;">
+                    <h4>⏱️ 计时规则</h4>
+                    <p style="margin-top: 0.5rem;">每人2分钟。1分30秒时会提醒"最后30秒"，到2分钟时收尾。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-13" data-slide="13">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-4">反思</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">第三幕 Contemplate</span>
+                    <span class="badge badge-gold">10分钟</span>
+                </div>
+                <h2 class="reveal">全班路演 + 印象最深的故事</h2>
+
+                <div class="card reveal">
+                    <div class="card-title">🎤 路演规则</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">⏱️</span>每人2分钟，按座位顺序来</li>
+                        <li><span class="icon">👂</span>听的同学任务：记一个"印象最深"的故事</li>
+                        <li><span class="icon">💬</span>等会要告诉那个同学为什么印象深刻</li>
+                    </ul>
+                </div>
+
+                <div class="speech-bubble teacher reveal" style="margin-top: 1rem;">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">第一个上来分享的老师自己，降低心理门槛。准备好了吗？开始！</p>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem; background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%); border-left: 3px solid #22c55e;">
+                    <div class="card-title">⭐ 路演结束后</div>
+                    <p style="font-size: var(--small-size);">谁能告诉我，今天听到的故事里，哪个最让你印象深刻？<strong>为什么？</strong></p>
+                    <p style="font-size: var(--small-size); color: var(--text-muted); margin-top: 0.5rem;">（引导说具体原因，而不只是名字）</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-14" data-slide="14">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">延续</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">第四幕 Continue</span>
+                    <span class="badge badge-gold">5分钟</span>
+                </div>
+                <h2 class="reveal">抽象总结</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">今天我们做了三件事——补完故事、设计封面、路演分享。但如果让老师说一句话总结今天，是这个：</p>
+                </div>
+
+                <div class="card reveal" style="background: linear-gradient(135deg, var(--primary) 0%, #5a4065 100%); color: white; margin-top: 1rem;">
+                    <h3 style="color: white; text-align: center; font-size: 1.5rem; margin-bottom: 0.5rem;">"把一件事情从头做到尾，才叫完成。"</h3>
+                    <p style="color: rgba(255,255,255,0.9); text-align: center; font-size: var(--small-size); margin: 0;">写了故事，但没有封面、没有作者的话，不算完整。<br>完整了，但没有给别人看，也不算真正"发布"。</p>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem;">
+                    <p style="font-size: var(--body-size); text-align: center; color: var(--text-dark);">今天你们把这件事完整地走了一遍——<br><strong>从有想法，到写出来，到站起来讲给别人听。</strong></p>
+                    <p style="font-size: var(--small-size); text-align: center; color: var(--text-muted); margin-top: 0.5rem;">这个能力，以后写作业、做项目、去面试都用得上。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-15" data-slide="15">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-4">选人</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">随机选人</span>
+                </div>
+                <h2 class="reveal">🎲 接下来谁先来路演？</h2>
+                <p class="subtitle reveal">点击按钮随机选择下一位演讲者</p>
+
+                <div class="reveal" style="margin-bottom: 1rem;">
+                    <div class="card">
+                        <div class="card-title">👥 添加学生名单</div>
+                        <textarea id="studentInput" placeholder="在此输入学生名字，每行一个&#10;例如：&#10;小明&#10;小红&#10;小华" style="width: 100%; height: 80px; padding: 0.5rem; border: 1px solid var(--card-border); border-radius: 8px; font-size: var(--small-size); resize: vertical;"></textarea>
+                        <button class="timer-btn" onclick="updateStudentList()" style="margin-top: 0.5rem; background: var(--primary);">💾 更新名单</button>
+                    </div>
+                </div>
+
+                <div class="picker-container reveal">
+                    <div style="font-size: var(--small-size); color: var(--text-muted);">🎰 随机选择器</div>
+                    <div class="picker-display" id="pickerDisplay">准备开始</div>
+                    <button class="picker-btn" id="pickerBtn" onclick="startPicker()">🎲 随机选择</button>
+                </div>
+
+                <div class="card reveal" style="margin-top: 0.8rem;">
+                    <div class="card-title">📝 使用说明</div>
+                    <ol class="numbered-list">
+                        <li>点击"随机选择"按钮</li>
+                        <li>等待滚动停止</li>
+                        <li>被选中的同学请准备路演</li>
+                        <li>演讲结束后，再次点击选择下一位</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-16" data-slide="16">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-4">计时器</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-rose">实用工具</span>
+                </div>
+                <h2 class="reveal">路演倒计时器</h2>
+                <p class="subtitle reveal">每人2分钟，点击开始计时</p>
+
+                <div class="timer-container reveal">
+                    <div style="font-size: var(--small-size); opacity: 0.9;">⏱️ 路演时间控制</div>
+                    <div class="timer-display" id="timerDisplay">02:00</div>
+                    <div style="font-size: var(--small-size);">
+                        <span id="timerStatus">准备就绪</span>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="timer-btn" onclick="startTimer()">▶️ 开始</button>
+                        <button class="timer-btn" onclick="pauseTimer()">⏸️ 暂停</button>
+                        <button class="timer-btn" onclick="resetTimer()">🔄 重置</button>
+                    </div>
+                </div>
+
+                <div class="card reveal">
+                    <div class="card-title">⏱️ 计时规则</div>
+                    <ul class="feature-list">
+                        <li><span class="icon">🟢</span>前1分30秒：正常进行</li>
+                        <li><span class="icon">🟡</span>1分30秒时：提醒"最后30秒"</li>
+                        <li><span class="icon">🔴</span>2分钟时：时间到，请收尾</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-17" data-slide="17">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">预告</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">阶段过渡</span>
+                </div>
+                <h2 class="reveal">宣布一个消息</h2>
+
+                <div class="speech-bubble teacher reveal">
+                    <p style="font-size: var(--body-size); color: var(--text-dark); margin: 0;">从今天开始，我们这门课正式进入下一个阶段。</p>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem;">
+                    <h4 style="color: var(--primary);">📚 前六节课 = 打地基</h4>
+                    <p style="font-size: var(--small-size);">搞清楚AI是什么，怎么跟AI说话，怎么用AI做东西</p>
+                </div>
+
+                <div class="card reveal" style="background: linear-gradient(135deg, #f8f5ff 0%, #f3e8ff 100%); border-left: 3px solid var(--primary);">
+                    <h4 style="color: var(--primary);">🏗️ 下节课开始 = 盖楼</h4>
+                    <p style="font-size: var(--small-size);">我们要做<strong>真正的产品</strong>——别人也能用的东西。不是故事，而是可以点击、可以互动、可以给别人玩的东西。</p>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem;">
+                    <p style="font-size: var(--body-size); text-align: center; margin: 0;">🚀 下节课，你们会做出人生中第一个<br><strong>"可以在浏览器里打开的作品"</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-18" data-slide="18">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-1">挑战</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">本周挑战</span>
+                </div>
+                <h2 class="reveal">5分钟AI挑战</h2>
+                <p class="subtitle reveal">给你的故事写一张"书腰文案"</p>
+
+                <div class="card reveal">
+                    <p style="font-size: var(--body-size);">书腰是书封背面那短短几行介绍，让路过的人一眼就想翻开。</p>
+                </div>
+
+                <div class="tip-box reveal">
+                    <h4>💻 提示词</h4>
+                    <div class="code-block-wrapper" style="margin-top: 0.5rem;">
+                        <div class="code-block" style="font-size: 0.8rem;">我有一本短篇小说叫《XX》，主角是……，故事讲的是……
+请帮我写一段书腰文案，控制在50字以内，要让人一眼就想翻开这本书。</div>
+                    </div>
+                </div>
+
+                <div class="challenge-card reveal" style="margin-top: 1rem;">
+                    <h4>🏆 下节课评选</h4>
+                    <p style="margin-top: 0.5rem;">谁的书腰文案最让人想看，老师来评！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-19" data-slide="19">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-2">AI助手</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">AI助教使用指南</span>
+                </div>
+                <h2 class="reveal">教师演示用提示词</h2>
+
+                <div class="two-column reveal">
+                    <div class="column">
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">📝 完整故事续写/结尾</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">我的故事写到了第X章，下面是已有内容：
+[粘贴故事内容]
+请帮我用3-5句话写一个简短的结尾，
+让故事有个交代，风格和前面保持一致。</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">📕 封面页生成</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">帮我在故事文件的最开头，插入一个Markdown格式的封面页。
+信息如下：
+- 书名：[书名]
+- 作者：[作者名]
+- 类型：[类型]
+- 主角：[一句话描述]
+- 故事简介：[两句话概括]
+格式：# 做书名大标题，其他信息用 **xx：** + 内容</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">💬 作者的话</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">帮我在故事最后加一段"作者的话"。
+内容：
+写这个故事时，我想到了[xxx]
+我最喜欢第X章[哪段]，因为[原因]
+结尾写：—— [名字]，写于2026年
+格式：## 作者的话，语气温暖自然。</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">📄 文段分段</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">帮我把下面这段文字按内容自然地分成3-4段，每段换行，不要改文字内容：
+[粘贴文字]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-20" data-slide="20">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-2">AI助手</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-lavender">AI助教使用指南</span>
+                </div>
+                <h2 class="reveal">学生保底提示词</h2>
+
+                <div class="two-column reveal">
+                    <div class="column">
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">🤔 卡在选精彩片段时</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">请从我的故事里帮我找出最有画面感的一段，
+给我3个候选，说明每段在第几章、
+大概讲什么。最终由我来决定用哪段。</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">📖 不知道书名怎么取</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">我的故事类型是[类型]，主角是[描述]，
+故事讲的是[一句话]。
+请给我推荐5个书名，要有一点诗意，
+不要太普通。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">✨ 进阶：加章节小标题</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">我的故事有3章，每章内容如下：
+第一章：[主要内容]
+第二章：[主要内容]
+第三章：[主要内容]
+请给每章起一个5-8字的标题，有意境，
+但不要剧透。</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 0.75rem;">
+                            <div class="card-title">📚 进阶：故事续集提案</div>
+                            <div class="code-block-wrapper">
+                                <div class="code-block" style="font-size: 0.75rem; padding: 1rem;">我的故事结局留下了什么"未解之谜"？
+请帮我写一个"第二册提案"：
+下一个故事的主角是谁、
+发生了什么新的事件、
+和第一册有什么联系。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-21" data-slide="21">
+        <div class="slide-content">
+            <div class="main-card">
+                <div class="book-spine">
+                    <div class="spine-section spine-3">FAQ</div>
+                </div>
+                <div class="badge-container reveal">
+                    <span class="badge badge-rose">常见问题</span>
+                </div>
+                <h2 class="reveal">课堂风险预案</h2>
+
+                <div class="scene-container reveal">
+                    <div class="scene-card scene-b">
+                        <h4>❓ "我的故事写坏了，不想要了"</h4>
+                        <p><strong>应对：</strong>"写坏了才是正常的第一版。封面做好之后，你会发现这本书看起来比你想的好多了。先把它完整，再说要不要改。"</p>
+                    </div>
+                    <div class="scene-card scene-c">
+                        <h4>❓ 路演时说不出话，卡住了</h4>
+                        <p><strong>应对：</strong>教师在旁边轻声提示："先说书名——"让学生接着说，不要代替学生说</p>
+                    </div>
+                </div>
+
+                <div class="scene-container reveal" style="margin-top: var(--content-gap);">
+                    <div class="scene-card scene-a">
+                        <h4>❓ 路演时间超出（全班路演太久）</h4>
+                        <p><strong>应对：</strong>切换成"30秒闪电版"：只说书名 + 精彩片段 + 一句话结尾</p>
+                    </div>
+                    <div class="scene-card" style="background: linear-gradient(135deg, #f0f8ff 0%, #e8f5ff 100%); border-top: 3px solid #3b82f6;">
+                        <h4 style="color: #1e40af;">❓ Trae无法使用</h4>
+                        <p><strong>应对：</strong>改用Claude网页版，让学生在聊天框里完成封面文字，教师截图展示。路演照常进行。</p>
+                    </div>
+                </div>
+
+                <div class="card reveal" style="margin-top: 1rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px dashed var(--accent-gold);">
+                    <p style="text-align: center; margin: 0; color: #8c6b3d;"><strong>核心原则：</strong>今天目标是"完整"不是"长"。封面和作者的话同样重要！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide slide-22" data-slide="22">
+        <div class="slide-content" style="align-items: center; text-align: center;">
+            <div class="main-card" style="text-align: center;">
+                <div class="badge-container reveal">
+                    <span class="badge badge-gold">完结撒花</span>
+                </div>
+                <div style="font-size: clamp(4rem, 10vw, 6rem); margin-bottom: 1rem;" class="reveal">🎉</div>
+                <h1 class="reveal" style="margin-bottom: 0.5rem;">恭喜！你完成了！</h1>
+                <p class="subtitle reveal" style="max-width: 500px; margin: 0 auto;">从今天起，你就是一个有完整作品的大作家了！</p>
+
+                <div class="feature-grid reveal" style="margin-top: 1.5rem;">
+                    <div class="feature-item">
+                        <div class="emoji">📕</div>
+                        <h4>完整封面</h4>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">📖</div>
+                        <h4>完整故事</h4>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">💬</div>
+                        <h4>作者的话</h4>
+                    </div>
+                    <div class="feature-item">
+                        <div class="emoji">🎤</div>
+                        <h4>路演分享</h4>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: linear-gradient(135deg, rgba(107, 76, 122, 0.1) 0%, rgba(212, 165, 116, 0.1) 100%); border-radius: 12px;" class="reveal">
+                    <p style="font-size: var(--h3-size); color: var(--primary); font-weight: 700; margin: 0;">"我是大作家"系列<br>圆满完结！</p>
+                </div>
+
+                <p class="reveal" style="margin-top: 1.5rem; color: var(--text-muted); font-size: var(--small-size);">下节课见，期待看到你们的书腰文案！</p>
+
+                <button class="picker-btn reveal" style="margin-top: 1rem;" onclick="createConfetti()">🎊 再撒一次花</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="keyboard-hint">← → 方向键或空格键切换幻灯片</div>
+
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.progressBar = document.getElementById('progressBar');
+                this.navDots = document.getElementById('navDots');
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                            this.updateProgressBar();
+                            this.updateNavDots();
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable')) return;
+                    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let touchStartY = 0;
+                let touchEndY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleSwipe(touchStartY, touchEndY);
+                });
+            }
+
+            handleSwipe(startY, endY) {
+                const threshold = 50;
+                const diff = startY - endY;
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        this.nextSlide();
+                    } else {
+                        this.prevSlide();
+                    }
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            setupProgressBar() {
+                this.updateProgressBar();
+            }
+
+            updateProgressBar() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progressBar.style.width = progress + '%';
+
+                const pageNumberElement = document.getElementById('pageNumber');
+                if (pageNumberElement) {
+                    pageNumberElement.textContent = `${this.currentSlide + 1} / ${this.totalSlides}`;
+                }
+            }
+
+            setupNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+        }
+
+        class CodeCopy {
+            constructor() {
+                this.setupCopyButtons();
+            }
+
+            setupCopyButtons() {
+                const codeBlocks = document.querySelectorAll('.code-block');
+                codeBlocks.forEach(block => {
+                    const wrapper = block.closest('.code-block-wrapper') || block.parentElement;
+
+                    const btn = document.createElement('button');
+                    btn.className = 'copy-btn';
+                    btn.innerHTML = '📋 复制';
+                    btn.addEventListener('click', () => this.copyCode(block, btn));
+
+                    wrapper.style.position = 'relative';
+                    wrapper.appendChild(btn);
+                });
+            }
+
+            async copyCode(block, btn) {
+                const code = block.textContent;
+
+                try {
+                    await navigator.clipboard.writeText(code);
+                    btn.innerHTML = '✓ 已复制';
+                    btn.classList.add('copied');
+
+                    setTimeout(() => {
+                        btn.innerHTML = '📋 复制';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = code;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+
+                    try {
+                        document.execCommand('copy');
+                        btn.innerHTML = '✓ 已复制';
+                        btn.classList.add('copied');
+
+                        setTimeout(() => {
+                            btn.innerHTML = '📋 复制';
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    } catch (e) {
+                        btn.innerHTML = '❌ 失败';
+                        setTimeout(() => {
+                            btn.innerHTML = '📋 复制';
+                        }, 2000);
+                    }
+
+                    document.body.removeChild(textarea);
+                }
+            }
+        }
+
+        function checkAnswer(element, isCorrect) {
+            const allOptions = element.parentElement.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('quizFeedback');
+
+            allOptions.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'wrong');
+                opt.style.pointerEvents = 'none';
+            });
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.className = 'quiz-feedback correct show';
+                feedback.innerHTML = '✅ 回答正确！完整作品需要封面、正文和作者的话。';
+                createConfetti();
+            } else {
+                element.classList.add('wrong');
+                feedback.className = 'quiz-feedback wrong show';
+                feedback.innerHTML = '❌ 不对哦。完整作品需要封面+正文+作者的话，缺一不可！';
+            }
+        }
+
+        function flipCard(container) {
+            container.classList.toggle('flipped');
+        }
+
+        const typewriterTexts = [
+            "我来帮你写一个结尾...",
+            "小星终于明白，能听懂猫说话不是诅咒，而是一份礼物。",
+            "从那天起，他成了城市里最特别的「猫语者」。",
+            "而那只黑猫，成了他最好的朋友。",
+            "【完】"
+        ];
+
+        let typewriterIndex = 0;
+        let typewriterCharIndex = 0;
+        let typewriterTimeout = null;
+
+        function startTypewriterDemo() {
+            const content = document.getElementById('typewriterContent');
+            const status = document.getElementById('typewriterStatus');
+
+            if (typewriterTimeout) return;
+
+            content.innerHTML = '<span class="typewriter-cursor"></span>';
+            status.style.display = 'flex';
+            typewriterIndex = 0;
+            typewriterCharIndex = 0;
+
+            typeNextLine();
+        }
+
+        function typeNextLine() {
+            if (typewriterIndex >= typewriterTexts.length) {
+                document.getElementById('typewriterStatus').style.display = 'none';
+                typewriterTimeout = null;
+                return;
+            }
+
+            const content = document.getElementById('typewriterContent');
+            const currentText = typewriterTexts[typewriterIndex];
+
+            if (typewriterCharIndex === 0) {
+                const lineSpan = document.createElement('div');
+                lineSpan.className = 'typewriter-line';
+                lineSpan.style.marginBottom = '0.5rem';
+                content.insertBefore(lineSpan, content.querySelector('.typewriter-cursor'));
+            }
+
+            const lines = content.querySelectorAll('.typewriter-line');
+            const currentLine = lines[lines.length - 1];
+
+            if (typewriterCharIndex < currentText.length) {
+                currentLine.textContent += currentText[typewriterCharIndex];
+                typewriterCharIndex++;
+                typewriterTimeout = setTimeout(typeNextLine, 50);
+            } else {
+                typewriterIndex++;
+                typewriterCharIndex = 0;
+                typewriterTimeout = setTimeout(typeNextLine, 300);
+            }
+        }
+
+        function resetTypewriter() {
+            const content = document.getElementById('typewriterContent');
+            const status = document.getElementById('typewriterStatus');
+
+            clearTimeout(typewriterTimeout);
+            typewriterTimeout = null;
+            content.innerHTML = '<span class="typewriter-placeholder">点击"开始演示"看AI如何帮你写故事结尾...</span><span class="typewriter-cursor"></span>';
+            status.style.display = 'none';
+        }
+
+        let timerInterval = null;
+        let timerSeconds = 120;
+        let isTimerRunning = false;
+
+        function startTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+            document.getElementById('timerStatus').textContent = '计时中...';
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+
+                if (timerSeconds <= 30 && timerSeconds > 0) {
+                    document.getElementById('timerDisplay').classList.add('warning');
+                    document.getElementById('timerStatus').textContent = '⚠️ 最后30秒！';
+                }
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    document.getElementById('timerDisplay').classList.remove('warning');
+                    document.getElementById('timerDisplay').classList.add('danger');
+                    document.getElementById('timerStatus').textContent = '⏰ 时间到！';
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            document.getElementById('timerStatus').textContent = '已暂停';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 120;
+            updateTimerDisplay();
+            document.getElementById('timerDisplay').classList.remove('warning', 'danger');
+            document.getElementById('timerStatus').textContent = '准备就绪';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function playBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function updateStudentList() {
+            const input = document.getElementById('studentInput');
+            const names = input.value.trim().split('\n').filter(name => name.trim() !== '');
+            if (names.length > 0) {
+                studentNames.length = 0;
+                studentNames.push(...names);
+                alert('学生名单已更新！共 ' + names.length + ' 人');
+            } else {
+                alert('请输入至少一个学生名字');
+            }
+        }
+
+        const studentNames = ['小明', '小红', '小华', '小丽', '小强', '小芳', '小军', '小敏'];
+        let isPicking = false;
+
+        function startPicker() {
+            if (isPicking) return;
+            isPicking = true;
+
+            const display = document.getElementById('pickerDisplay');
+            const btn = document.getElementById('pickerBtn');
+
+            display.classList.add('spinning');
+            btn.disabled = true;
+            btn.textContent = '🎲 选择中...';
+
+            let spins = 0;
+            const maxSpins = 20;
+            const interval = setInterval(() => {
+                display.textContent = studentNames[Math.floor(Math.random() * studentNames.length)];
+                spins++;
+
+                if (spins >= maxSpins) {
+                    clearInterval(interval);
+                    display.classList.remove('spinning');
+                    const selected = studentNames[Math.floor(Math.random() * studentNames.length)];
+                    display.textContent = '🎉 ' + selected + ' 🎉';
+                    display.style.color = '#22c55e';
+                    btn.disabled = false;
+                    btn.textContent = '🎲 再选一位';
+                    isPicking = false;
+                    createConfetti();
+                }
+            }, 100);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff5f56', '#ffbd2e', '#27ca40', '#6b4c7a', '#d4a574'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+            new CodeCopy();
+        });
+    </script>
+</body>
+</html>
